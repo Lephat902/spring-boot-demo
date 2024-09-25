@@ -1,8 +1,5 @@
 package com.phatle.demo.controller;
 
-import java.util.List;
-import java.util.UUID;
-
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +11,6 @@ import com.phatle.demo.dto.AddUserDTO;
 import com.phatle.demo.dto.LoginDTO;
 import com.phatle.demo.dto.UserDTO;
 import com.phatle.demo.entity.User;
-import com.phatle.demo.entity.UserRole;
 import com.phatle.demo.security.JwtTokenVo;
 import com.phatle.demo.security.SecurityUtils;
 import com.phatle.demo.service.UserService;
@@ -31,17 +27,9 @@ public class AuthController {
     public void login(@Valid @RequestBody LoginDTO loginDTO) {
         service.login(loginDTO);
         var auth = SecurityContextHolder.getContext().getAuthentication();
-        List<UserRole> roles = auth.getAuthorities()
-                .stream()
-                .map(ga -> UserRole.valueOf(ga.toString()))
-                .toList();
+        var jwtToken = (JwtTokenVo) auth.getPrincipal();
 
-        JwtTokenVo jwtTokenVo = JwtTokenVo.builder()
-                .id((UUID) auth.getPrincipal())
-                .roles(roles)
-                .build();
-
-        SecurityUtils.setJwtToClient(jwtTokenVo);
+        SecurityUtils.setJwtToClient(jwtToken);
     }
 
     @PostMapping("/signup")

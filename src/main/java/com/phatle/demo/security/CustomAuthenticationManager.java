@@ -25,8 +25,8 @@ public class CustomAuthenticationManager implements AuthenticationManager {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        String username = authentication.getPrincipal() + "";
-        String password = authentication.getCredentials() + "";
+        String username = (String) authentication.getPrincipal();
+        String password = (String) authentication.getCredentials();
 
         User user = userRepository.findOneByUsername(username).orElseThrow(
                 () -> new BadCredentialsException("1000"));
@@ -34,9 +34,10 @@ public class CustomAuthenticationManager implements AuthenticationManager {
             throw new BadCredentialsException("1000");
         }
         UserRole userRole = user.getUserRole();
-        // JWT will further need userID, not username
+        var jwtToken = SecurityUtils.buildJwtTokenFromUser(user);
+
         return new UsernamePasswordAuthenticationToken(
-                user.getId(),
+                jwtToken,
                 null,
                 Arrays.asList(new SimpleGrantedAuthority(userRole.toString())));
     }

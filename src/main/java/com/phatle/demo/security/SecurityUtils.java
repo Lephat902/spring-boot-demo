@@ -1,5 +1,6 @@
 package com.phatle.demo.security;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.phatle.demo.entity.User;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
@@ -56,6 +58,13 @@ public class SecurityUtils {
                 .withIssuer(ISSUER)
                 .withExpiresAt(new Date(System.currentTimeMillis() + SIX_HOURS_MILLISECOND))
                 .sign(ALGORITHM);
+    }
+
+    public static JwtTokenVo buildJwtTokenFromUser(User user) {
+        return JwtTokenVo.builder()
+                .id(user.getId())
+                .roles(Arrays.asList(user.getUserRole()))
+                .build();
     }
 
     public static void setJwtToClient(JwtTokenVo vo) {

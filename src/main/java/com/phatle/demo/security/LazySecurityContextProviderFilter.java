@@ -5,11 +5,11 @@ import java.util.Date;
 
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -54,7 +54,7 @@ public class LazySecurityContextProviderFilter extends OncePerRequestFilter {
                     }
 
                     var jwtTokenVo = SecurityUtils.getValueObject(decodedJWT);
-                    var authToken = new PreAuthenticatedAuthenticationToken(jwtTokenVo, null,
+                    var authToken = new UsernamePasswordAuthenticationToken(jwtTokenVo, null,
                             jwtTokenVo.getAuthorities());
 
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
