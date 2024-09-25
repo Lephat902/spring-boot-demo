@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(a -> {
                     a.requestMatchers(HttpMethod.GET, "/users").hasAuthority(UserRole.ADMIN.toString());
+                    a.requestMatchers(HttpMethod.GET, "/self").authenticated();
                     a.anyRequest().permitAll();
                 })
                 .addFilterAfter(lazySecurityContextProviderFilter, SessionManagementFilter.class);

@@ -8,7 +8,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,6 @@ import com.phatle.demo.dto.AddUserDTO;
 import com.phatle.demo.dto.LoginDTO;
 import com.phatle.demo.dto.UserDTO;
 import com.phatle.demo.entity.User;
-import com.phatle.demo.entity.UserRole;
 import com.phatle.demo.mapper.EntityDTOMapper;
 import com.phatle.demo.repository.UserRepository;
 
@@ -37,6 +35,15 @@ public class UserService {
         return mapper.toDTOs(repository.findAll());
     }
 
+    public UserDTO findById(UUID id) {
+        var user = repository.findById(id)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "User not found with id: " + id));
+        return mapper.toDTO(user);
+    }
+
     @Transactional
     public User save(AddUserDTO addUserDTO) {
         repository.findOneByUsername(addUserDTO.getUsername()).ifPresent(existingUser -> {
@@ -49,21 +56,11 @@ public class UserService {
         return repository.save(userToSave);
     }
 
-    public User login(LoginDTO loginDTO) {
+    public void login(LoginDTO loginDTO) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            var userID = (UUID) authentication.getPrincipal();
-            // Currently, user has only one role
-            var userRole = (SimpleGrantedAuthority) authentication.getAuthorities().toArray()[0];
-
-            User user = new User();
-            user.setId(userID);
-            user.setUserRole(UserRole.valueOf(userRole.toString()));
-
-            return user;
         } catch (AuthenticationException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
