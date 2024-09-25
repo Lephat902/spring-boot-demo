@@ -29,7 +29,8 @@ public class CustomPhysicalNamingStrategy implements PhysicalNamingStrategy {
 
     @Override
     public Identifier toPhysicalColumnName(Identifier name, JdbcEnvironment jdbcEnvironment) {
-        return name;
+        String columnName = convertToSnakeCase(name.getText());
+        return new Identifier(columnName, name.isQuoted());
     }
 
     private String convertToSnakeCase(String name) {
