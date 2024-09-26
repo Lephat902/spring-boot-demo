@@ -29,9 +29,11 @@ public class User implements UserDetails {
     private UUID id;
 
     @Column(unique = true, nullable = false)
+    private String email;
+
+    @Column(unique = true)
     private String username;
 
-    @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)
