@@ -18,6 +18,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.phatle.demo.entity.UserRole;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -31,6 +32,7 @@ public class SecurityConfig {
             LazySecurityContextProviderFilter lazySecurityContextProviderFilter) throws Exception {
 
         http
+                .httpBasic(basic -> basic.disable())
                 .sessionManagement(se -> se.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(a -> {
@@ -40,6 +42,13 @@ public class SecurityConfig {
                 })
                 .oauth2Login(oauth2Login -> oauth2Login
                         .successHandler(customOAuth2AuthenticationSuccessHandler))
+                .exceptionHandling(handling -> handling
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
+                        }))
                 .addFilterAfter(lazySecurityContextProviderFilter, SessionManagementFilter.class);
 
         return http.build();
