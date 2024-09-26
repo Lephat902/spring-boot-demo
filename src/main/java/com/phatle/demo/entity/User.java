@@ -10,6 +10,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -34,7 +36,12 @@ public class User implements UserDetails {
     @Column(unique = true)
     private String username;
 
+    private String name;
+
+    @JsonIgnore
     private String password;
+
+    private String picture;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -44,10 +51,15 @@ public class User implements UserDetails {
 
     private Date birthDate;
 
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(userRole.toString()));
         return authorities;
+    }
+
+    public boolean isPasswordSet() {
+        return password != null;
     }
 }

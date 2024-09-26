@@ -17,10 +17,16 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.phatle.demo.entity.UserRole;
+import com.phatle.demo.service.CustomOAuth2AuthenticationSuccessHandler;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+    private final CustomOAuth2AuthenticationSuccessHandler customOAuth2AuthenticationSuccessHandler;
+
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http,
             LazySecurityContextProviderFilter lazySecurityContextProviderFilter) throws Exception {
@@ -33,10 +39,11 @@ public class SecurityConfig {
                     a.requestMatchers(HttpMethod.GET, "/self").authenticated();
                     a.anyRequest().permitAll();
                 })
+                .oauth2Login(oauth2Login -> oauth2Login
+                        .successHandler(customOAuth2AuthenticationSuccessHandler))
                 .addFilterAfter(lazySecurityContextProviderFilter, SessionManagementFilter.class);
 
         return http.build();
-
     }
 
     @Bean

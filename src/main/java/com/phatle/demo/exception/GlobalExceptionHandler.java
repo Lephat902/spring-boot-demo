@@ -40,9 +40,16 @@ public class GlobalExceptionHandler {
         return e.getMessage();
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalArgumentException.class)
+    public String handleResourceNotFoundExceptions(
+        IllegalArgumentException e) {
+        return e.getMessage();
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleUnwantedException(Exception e) {
-        e.printStackTrace();
+        System.err.println(e.getMessage());
         return ResponseEntity.status(500).body("Internal server error");
     }
 }

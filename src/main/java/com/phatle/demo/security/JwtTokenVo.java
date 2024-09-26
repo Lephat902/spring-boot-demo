@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.security.core.GrantedAuthority;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.phatle.demo.entity.UserRole;
 
 import lombok.AllArgsConstructor;
@@ -21,7 +22,8 @@ public class JwtTokenVo {
     private UUID id;
     private List<UserRole> roles;
 
-    List<GrantedAuthority> getAuthorities() {
+    @JsonIgnore
+    public List<GrantedAuthority> getAuthorities() {
         if (roles == null)
             return new ArrayList<>();
         return roles.stream().map(s -> (GrantedAuthority) () -> s.toString()).toList();
