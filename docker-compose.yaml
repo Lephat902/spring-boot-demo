@@ -1,0 +1,11 @@
+services:
+  my-java-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    volumes:
+      - .:/app  # Mount the current directory to the container for live reload
