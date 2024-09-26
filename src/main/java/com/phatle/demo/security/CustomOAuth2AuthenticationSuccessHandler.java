@@ -1,4 +1,4 @@
-package com.phatle.demo.service;
+package com.phatle.demo.security;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import com.phatle.demo.entity.User;
 import com.phatle.demo.repository.UserRepository;
-import com.phatle.demo.security.SecurityUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

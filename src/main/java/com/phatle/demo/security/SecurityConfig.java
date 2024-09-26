@@ -17,7 +17,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.phatle.demo.entity.UserRole;
-import com.phatle.demo.service.CustomOAuth2AuthenticationSuccessHandler;
 
 import lombok.RequiredArgsConstructor;
 
