@@ -1,4 +1,5 @@
 
+
 # Tiny Application with Java Spring Boot
 
 ## Introduction
@@ -11,7 +12,7 @@ The concepts that we are going to go through in this app are:
 - A simple business flow to signup, login, get user-self, get other users.
 - Basic JWT authentication, authorization with Spring Security.
 - OAuth2 with Google ([reference](https://medium.com/@sallu-salman/implementing-sign-in-with-google-in-spring-boot-application-5f05a34905a8)).
-- Write unit tests with Mockito and set up a GitHub pipeline (TO-DO).
+- Write unit tests using Mockito and set up a CI pipeline on GitHub ([reference](https://blog.tericcabrel.com/springboot-github-actions-ci-cd/)). Note that this pipeline will focus solely on Continuous Integration (CI), as Continuous Deployment (CD) is delegated to cloud auto-build.
 
 ## Start Application
 **Notice:** In order for the app to function properly, you have to fill in the values specified in `.env.example` and put them in a file called `.env`.
