@@ -3,6 +3,8 @@ package com.phatle.demo.service;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,10 +33,12 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
+    @Cacheable("users")
     public List<UserDTO> findAll() {
         return mapper.toDTOs(repository.findAll());
     }
 
+    @Cacheable("user")
     public UserDTO findById(UUID id) {
         var user = repository.findById(id)
                 .orElseThrow(
@@ -45,6 +49,7 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(value = "users", allEntries = true)
     public User save(AddUserDTO addUserDTO) {
         repository.findOneByUsername(addUserDTO.getUsername()).ifPresent(existingUser -> {
             throw new ResponseStatusException(
