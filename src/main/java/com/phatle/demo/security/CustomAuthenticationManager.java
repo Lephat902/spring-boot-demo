@@ -12,7 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.phatle.demo.entity.User;
-import com.phatle.demo.entity.UserRole;
 import com.phatle.demo.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -25,15 +24,23 @@ public class CustomAuthenticationManager implements AuthenticationManager {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        String username = (String) authentication.getPrincipal();
-        String password = (String) authentication.getCredentials();
+        var principal = (String) authentication.getPrincipal();
+        var password = (String) authentication.getCredentials();
 
-        User user = userRepository.findOneByUsername(username).orElseThrow(
-                () -> new BadCredentialsException("1000"));
+        User user;
+        if (principal.contains("@")) {
+            user = userRepository.findOneByEmail(principal).orElseThrow(
+                    () -> new BadCredentialsException("1000"));
+        } else {
+            user = userRepository.findOneByUsername(principal).orElseThrow(
+                    () -> new BadCredentialsException("1000"));
+        }
+
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new BadCredentialsException("1000");
         }
-        UserRole userRole = user.getUserRole();
+
+        var userRole = user.getUserRole();
         var jwtToken = SecurityUtils.buildJwtTokenFromUser(user);
 
         return new UsernamePasswordAuthenticationToken(
