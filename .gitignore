@@ -34,3 +34,4 @@ build/
 
 # Env var
 .env*
+!.env.example

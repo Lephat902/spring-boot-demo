@@ -59,7 +59,7 @@ public class LazySecurityContextProviderFilter extends OncePerRequestFilter {
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
                     securityCtx.setAuthentication(authToken);
                 } catch (Exception e) {
-                    System.err.println("Co gi sai sai o token");
+                    log.debug("Co gi sai sai o token");
                 }
             }
 
