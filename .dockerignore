@@ -28,6 +28,9 @@ Thumbs.db
 .git
 .gitignore
 
+# GitHub Actions
+.github/
+
 # Ignore Docker-related files
 Dockerfile
 docker-compose.yml
