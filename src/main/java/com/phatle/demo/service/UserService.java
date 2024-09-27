@@ -46,10 +46,10 @@ public class UserService {
 
     @Transactional
     public User save(AddUserDTO addUserDTO) {
-        repository.findOneByUsername(addUserDTO.getUsername()).ifPresent(existingUser -> {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "Username already exists: " + addUserDTO.getUsername());
-        });
+        // repository.findOneByUsername(addUserDTO.getUsername()).ifPresent(existingUser -> {
+        //     throw new ResponseStatusException(
+        //             HttpStatus.CONFLICT, "Username already exists: " + addUserDTO.getUsername());
+        // });
 
         User userToSave = mapper.toEntity(addUserDTO);
         userToSave.setPassword(passwordEncoder.encode(userToSave.getPassword()));
