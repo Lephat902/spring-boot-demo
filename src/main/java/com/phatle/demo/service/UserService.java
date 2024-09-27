@@ -56,10 +56,6 @@ public class UserService {
         return repository.save(userToSave);
     }
 
-    public User saveOAuthUser(User user) {
-        return repository.save(user);
-    }
-
     public void login(LoginDTO loginDTO) {
         try {
             Authentication authentication = authenticationManager.authenticate(
