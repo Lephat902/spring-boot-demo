@@ -15,6 +15,7 @@ The concepts that we are going to go through in this app are:
 
 ## Start Application
 **Notice:** In order for the app to function properly, you have to fill in the values specified in `.env.example` and put them in a file called `.env`.
+
 **Notice:** 
 - The `spring-boot-devtools` module can conflict with Redis Cache. To ensure smooth functionality, you may need to **remove** the DevTools dependency from your `pom.xml` when using Redis Cache. You can choose to work with either Redis or the live-reload feature, but not both simultaneously. 
 - To enable/disable the caching feature in your application, follow these steps:
