@@ -1,5 +1,5 @@
 services:
-  my-java-app:
+  demo:
     build:
       context: .
       dockerfile: Dockerfile.dev
@@ -9,3 +9,8 @@ services:
       - .env
     volumes:
       - .:/app  # Mount the current directory to the container for live reload
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"

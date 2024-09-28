@@ -1,5 +1,6 @@
 package com.phatle.demo.dto;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
@@ -10,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserDTO {
+public class UserDTO implements Serializable {
     private UUID id;
     private String username;
     private String email;
