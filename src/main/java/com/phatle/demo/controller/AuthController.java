@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
     private final UserService service;
 
-    @PostMapping("/login")
+    @PostMapping("/signin")
     public void login(@Valid @RequestBody LoginDTO loginDTO) {
         service.login(loginDTO);
         var auth = SecurityContextHolder.getContext().getAuthentication();

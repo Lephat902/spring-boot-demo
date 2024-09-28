@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -12,13 +13,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.session.SessionManagementFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.phatle.demo.entity.UserRole;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -26,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final CustomOAuth2AuthenticationSuccessHandler customOAuth2AuthenticationSuccessHandler;
+    private final Environment env;
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http,
@@ -36,20 +38,20 @@ public class SecurityConfig {
                 .sessionManagement(se -> se.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(a -> {
-                    a.requestMatchers(HttpMethod.GET, "/users").hasAuthority(UserRole.ADMIN.toString());
+                    a.requestMatchers(HttpMethod.GET, "/users/**").hasAuthority(UserRole.ADMIN.toString());
                     a.requestMatchers(HttpMethod.GET, "/self").authenticated();
                     a.anyRequest().permitAll();
                 })
                 .oauth2Login(oauth2Login -> oauth2Login
                         .successHandler(customOAuth2AuthenticationSuccessHandler))
-                .exceptionHandling(handling -> handling
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-                        })
-                        .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
-                        }))
-                .addFilterAfter(lazySecurityContextProviderFilter, SessionManagementFilter.class);
+                .addFilterAfter(lazySecurityContextProviderFilter, SessionManagementFilter.class)
+                // WITHOUT the following block:
+                // 1) Any unauthorized requests will be redirected to OAuth2 login page
+                // 2) Status code will then be 302 instead of 401
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .defaultAuthenticationEntryPointFor(
+                                new CustomAuthenticationEntryPoint(),
+                                new AntPathRequestMatcher("/**")));
 
         return http.build();
     }
@@ -57,7 +59,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080"));
+        configuration.setAllowedOrigins(Arrays.asList(env.getProperty("HOST")));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
