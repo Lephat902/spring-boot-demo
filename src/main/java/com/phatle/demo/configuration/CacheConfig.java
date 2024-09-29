@@ -28,6 +28,9 @@ public class CacheConfig {
 								.entryTtl(Duration.ofMinutes(10)))
 				.withCacheConfiguration("users",
 						RedisCacheConfiguration.defaultCacheConfig()
-								.entryTtl(Duration.ofMinutes(5)));
+								.entryTtl(Duration.ofMinutes(5)))
+				.withCacheConfiguration("file",
+						RedisCacheConfiguration.defaultCacheConfig()
+								.entryTtl(Duration.ofMinutes(15)));
 	}
 }
