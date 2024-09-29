@@ -35,3 +35,6 @@ build/
 # Env var
 .env*
 !.env.example
+
+# Keys
+firebase-service-account-key.json

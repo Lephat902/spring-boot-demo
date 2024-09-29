@@ -43,7 +43,7 @@ public class SecurityUtils {
 
     // It's meant to be called only by system to assign env var to static field
     @Value("${SECRET_KEY}")
-    public void setStaticJwtKey(String jwtKey) {
+    void setStaticJwtKey(String jwtKey) {
         SECRET_KEY = jwtKey;
         ALGORITHM = Algorithm.HMAC256(SECRET_KEY);
     }
