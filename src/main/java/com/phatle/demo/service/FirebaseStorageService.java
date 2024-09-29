@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,7 @@ public class FirebaseStorageService {
         }
     }
 
+    @Cacheable("file")
     public String generateDownloadUrl(String uniqueFileName) {
         Bucket bucket = storage.get(BUCKET_NAME);
         Blob blob = bucket.get(uniqueFileName);
