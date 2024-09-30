@@ -1,9 +1,11 @@
 package com.phatle.demo.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
@@ -11,6 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
@@ -25,10 +28,12 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
@@ -118,5 +123,49 @@ public class FirebaseStorageServiceTest {
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
         assertEquals("File not found: " + uniqueFileName, exception.getReason());
+    }
+
+    @Test
+    public void uploadFile_AllowedFileType_Success() throws Exception {
+        var allowedFileName = "test.jpg";
+        var fileContent = "test content".getBytes();
+        var file = mock(MultipartFile.class);
+
+        when(file.getContentType()).thenReturn("image/jpeg");
+        when(file.getOriginalFilename()).thenReturn(allowedFileName);
+        when(file.getBytes()).thenReturn(fileContent);
+
+        var result = firebaseStorageService.uploadFile(file);
+
+        assertNotEquals(allowedFileName, result);
+        assertNotNull(result);
+        verify(storage).create(any(BlobInfo.class), eq(fileContent));
+    }
+
+    @Test
+    public void uploadFile_NotAllowedFileType_ThrowsException() {
+        var file = mock(MultipartFile.class);
+        when(file.getContentType()).thenReturn("application/zip");
+
+        var exception = assertThrows(IllegalArgumentException.class, () -> {
+            firebaseStorageService.uploadFile(file);
+        });
+        assertEquals("File type not allowed.", exception.getMessage());
+    }
+
+    @Test
+    public void uploadFile_UploadFailure_ThrowsException() throws Exception {
+        var allowedFileName = "test.pdf";
+        var file = mock(MultipartFile.class);
+
+        when(file.getContentType()).thenReturn("application/pdf");
+        when(file.getOriginalFilename()).thenReturn(allowedFileName);
+        when(file.getBytes()).thenThrow(new IOException());
+
+        var exception = assertThrows(ResponseStatusException.class, () -> {
+            firebaseStorageService.uploadFile(file);
+        });
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        assertEquals("Malformed file", exception.getReason());
     }
 }
